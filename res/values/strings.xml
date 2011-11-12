@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FMS(File Management System)</string>
+    <string name="images">Images</string>
+    <string name="audios">Audios</string>
+    <string name="movies">Movies</string>
+    <string name="documents">Docs</string>
+    <string name="zipfiles">Zips</string>
+    <string name="apkfiles">APKs</string>
+    <string name="menu_refresh">Refresh</string>
+</resources>
