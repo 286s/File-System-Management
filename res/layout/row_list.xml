@@ -7,10 +7,12 @@
         android:id="@+id/rowName"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@color/Color_Red"
         android:textSize="30px" />
     <TextView
         android:id="@+id/rowPath"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@color/Color_Blue"
         android:textSize="20px" />
 </LinearLayout>

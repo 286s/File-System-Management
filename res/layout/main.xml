@@ -116,16 +116,15 @@
             android:layout_weight="1"
             android:text="@string/apkfiles" />
     </TableRow>
-    <TableRow
-        android:id="@+id/row4"
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="bottom" >
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom" >
         <ProgressBar
             android:id="@+id/progressBar1"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom" />
-    </TableRow>
+    </LinearLayout>
 </LinearLayout>

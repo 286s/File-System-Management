@@ -70,6 +70,18 @@ public class MyAdapter {
 		return mCursor;
 	}
 
+	public Cursor fetchFile(long id) {
+		Cursor mCursor = mDb.query(true, DatabaseHelper.DATABASE_TABLE,
+				new String[] { DatabaseHelper.KEY_ROWID,
+						DatabaseHelper.KEY_PROP, DatabaseHelper.KEY_NAME,
+						DatabaseHelper.KEY_PATH }, DatabaseHelper.KEY_ROWID
+						+ "=" + id + "", null, null, null, null, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+		}
+		return mCursor;
+	}
+
 	public boolean deleteFile(long rowId) {
 		Cursor mCursor = mDb.query(DatabaseHelper.DATABASE_TABLE, new String[] {
 				DatabaseHelper.KEY_ROWID, DatabaseHelper.KEY_PROP,
@@ -77,9 +89,10 @@ public class MyAdapter {
 				DatabaseHelper.KEY_ROWID + "=" + Long.toString(rowId), null,
 				null, null, null);
 		if (mCursor != null) {
+			mCursor.moveToFirst();
 			Log.i("FMS", Integer.toString(mCursor.getColumnCount()));
-			String path = mCursor.getBlob(
-					mCursor.getColumnIndex(DatabaseHelper.KEY_PATH)).toString();
+			String path = new String(mCursor.getBlob(mCursor
+					.getColumnIndex(DatabaseHelper.KEY_PATH)));
 			File file = new File(path);
 			boolean successful = file.delete();
 			successful &= mDb.delete(DatabaseHelper.DATABASE_TABLE,

@@ -38,6 +38,10 @@ public class Main extends Activity {
 	Button imageFiles;
 	Button audioFiles;
 	Button movieFiles;
+	Button docsFiles;
+	Button zipsFiles;
+	Button apksFiles;
+
 	TextView img;
 	TextView aud;
 	TextView mov;
@@ -74,7 +78,86 @@ public class Main extends Activity {
 				startActivityForResult(intent, changeImage);
 			}
 		});
+		audioFiles = (Button) findViewById(R.id.btn_audioFiles);
+		audioFiles.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Main.this, Images.class);
+				intent.putExtra("NAME", AUDIO);
+				startActivityForResult(intent, changeImage);
+			}
+		});
+		movieFiles = (Button) findViewById(R.id.btn_movieFiles);
+		movieFiles.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Main.this, Images.class);
+				intent.putExtra("NAME", MOVIE);
+				startActivityForResult(intent, changeImage);
+			}
+		});
+		docsFiles = (Button) findViewById(R.id.btn_docsFiles);
+		docsFiles.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Main.this, Images.class);
+				intent.putExtra("NAME", DOCUMENTS);
+				startActivityForResult(intent, changeImage);
+			}
+		});
+		zipsFiles = (Button) findViewById(R.id.btn_zipsFiles);
+		zipsFiles.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Main.this, Images.class);
+				intent.putExtra("NAME", ZIPS);
+				startActivityForResult(intent, changeImage);
+			}
+		});
+		apksFiles = (Button) findViewById(R.id.btn_apksFiles);
+		apksFiles.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Main.this, Images.class);
+				intent.putExtra("NAME", APKS);
+				startActivityForResult(intent, changeImage);
+			}
+		});
 	}
+
+	// @Override
+	// public void onPause() {
+	// super.onPause();
+	// if (!scanned && myAdapter != null)
+	// myAdapter.close();
+	// }
+	//
+	// @Override
+	// protected void onDestroy() {
+	// super.onDestroy();
+	// if (myAdapter != null && !scanned) {
+	// myAdapter.close();
+	// }
+	// }
+	//
+	// @Override
+	// public void onResume() {
+	// super.onResume();
+	// if (myAdapter == null) {
+	// myAdapter = new MyAdapter(this);
+	// myAdapter.open();
+	// }
+	// }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,7 +189,7 @@ public class Main extends Activity {
 							Main.this,
 							"",
 							"Please wait, it might take 1 min if you have too many files.",
-							true, true);
+							true, false);
 			dialog = progressDialog;
 			break;
 		case dialog_Exit:
@@ -133,8 +216,7 @@ public class Main extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
 			if (scanned == true) {
-				mThread.stop();
-				mThread.destroy();
+				// mThread.stop();
 				progressDialog.dismiss();
 				updateLayoutData();
 			} else {
@@ -144,11 +226,17 @@ public class Main extends Activity {
 		return super.onKeyDown(keyCode, event);
 	}
 
+	/*
+	 * Read the file/directory hierarchy;
+	 * 
+	 * Start with the Exteral Storage Directory;
+	 * 
+	 * Using DFS function to implement this.
+	 */
 	public void readFiles() {
 		if (!scanned)
 			return;
-		// File root = Environment.getRootDirectory();
-		// readFile(root);
+
 		File storage = Environment.getExternalStorageDirectory();
 		// Log.i(TAG, storage.getAbsolutePath());
 		// Log.i(TAG, Environment.getExternalStorageState());
@@ -161,7 +249,7 @@ public class Main extends Activity {
 	}
 
 	/*
-	 * @param file, The general file/directory need to read;
+	 * @param file, The general meaning file/directory need to read;
 	 * 
 	 * Skip the directories starts with dot.
 	 */
@@ -249,6 +337,10 @@ public class Main extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		if (myAdapter == null) {
+			myAdapter = new MyAdapter(this);
+			myAdapter.open();
+		}
 		updateLayoutData();
 	}
 
