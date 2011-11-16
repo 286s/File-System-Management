@@ -82,7 +82,14 @@ public class MyAdapter {
 		return mCursor;
 	}
 
-	public boolean deleteFile(long rowId) {
+	/*
+	 * @param rowId: the corresponding id for the item in the database.
+	 * 
+	 * @param fromDatabaseOnly: if wish to delete item from database only.
+	 * 
+	 * @return if delete operation succeeded.
+	 */
+	public boolean deleteFile(long rowId, boolean fromDatabaseOnly) {
 		Cursor mCursor = mDb.query(DatabaseHelper.DATABASE_TABLE, new String[] {
 				DatabaseHelper.KEY_ROWID, DatabaseHelper.KEY_PROP,
 				DatabaseHelper.KEY_NAME, DatabaseHelper.KEY_PATH },
@@ -91,15 +98,19 @@ public class MyAdapter {
 		if (mCursor != null) {
 			mCursor.moveToFirst();
 			Log.i("FMS", Integer.toString(mCursor.getColumnCount()));
-			String path = new String(mCursor.getBlob(mCursor
-					.getColumnIndex(DatabaseHelper.KEY_PATH)));
-			File file = new File(path);
-			boolean successful = file.delete();
+			boolean successful = mDb.delete(DatabaseHelper.DATABASE_TABLE,
+					DatabaseHelper.KEY_ROWID + "=" + rowId, null) > 0;
+			if (!fromDatabaseOnly) {
+				String path = new String(mCursor.getBlob(mCursor
+						.getColumnIndex(DatabaseHelper.KEY_PATH)));
+				File file = new File(path);
+				successful &= file.delete();
+			}
 			successful &= mDb.delete(DatabaseHelper.DATABASE_TABLE,
 					DatabaseHelper.KEY_ROWID + "=" + rowId, null) > 0;
+			mCursor.close();
 			return successful;
 		}
-
 		return false;
 	}
 }

@@ -8,4 +8,7 @@
     <string name="zipfiles">Zips</string>
     <string name="apkfiles">APKs</string>
     <string name="menu_refresh">Rescan</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_share">Share</string>
+    <string name="contextMenu">Share or Delete</string>
 </resources>

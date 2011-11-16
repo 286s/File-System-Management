@@ -2,12 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/background"
     android:orientation="vertical" >
     <TableRow
         android:id="@+id/row1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp" >
+        android:layout_marginTop="40dp" >
         <Button
             android:id="@+id/btn_imageFiles"
             android:layout_width="0dp"
@@ -38,11 +39,11 @@
             android:id="@+id/tv_images"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="@string/images" />
+            android:text="@string/images"
+            android:textColor="#888888" />
         <TextView
             android:id="@+id/tv_audios"
             android:layout_width="0dp"
@@ -50,7 +51,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="@string/audios" />
+            android:text="@string/audios"
+            android:textColor="#888888" />
         <TextView
             android:id="@+id/tv_movies"
             android:layout_width="0dp"
@@ -58,7 +60,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="@string/movies" />
+            android:text="@string/movies"
+            android:textColor="#888888" />
     </TableRow>
     <TableRow
         android:id="@+id/row3"
@@ -98,7 +101,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="@string/documents" />
+            android:text="@string/documents"
+            android:textColor="#666666" />
         <TextView
             android:id="@+id/tv_zips"
             android:layout_width="0dp"
@@ -106,7 +110,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="@string/zipfiles" />
+            android:text="@string/zipfiles"
+            android:textColor="#666666" />
         <TextView
             android:id="@+id/tv_apks"
             android:layout_width="0dp"
@@ -114,17 +119,12 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="@string/apkfiles" />
+            android:text="@string/apkfiles"
+            android:textColor="#666666" />
     </TableRow>
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom" >
-        <ProgressBar
-            android:id="@+id/progressBar1"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom" />
     </LinearLayout>
 </LinearLayout>

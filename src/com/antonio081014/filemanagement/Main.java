@@ -59,80 +59,80 @@ public class Main extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
 		myAdapter = new MyAdapter(this);
 		myAdapter.open();
-		myAdapter.clearTable();
-
-		// scanned = true;
-		readFiles();
-		updateLayoutData();
 
 		imageFiles = (Button) findViewById(R.id.btn_imageFiles);
+		imageFiles.setBackgroundResource(R.drawable.icon_folders);
 		imageFiles.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Main.this, Images.class);
 				intent.putExtra("NAME", IMAGE);
 				startActivityForResult(intent, changeImage);
 			}
 		});
 		audioFiles = (Button) findViewById(R.id.btn_audioFiles);
+		audioFiles.setBackgroundResource(R.drawable.icon_folders);
 		audioFiles.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Main.this, Images.class);
 				intent.putExtra("NAME", AUDIO);
 				startActivityForResult(intent, changeImage);
 			}
 		});
 		movieFiles = (Button) findViewById(R.id.btn_movieFiles);
+		movieFiles.setBackgroundResource(R.drawable.icon_folders);
 		movieFiles.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Main.this, Images.class);
 				intent.putExtra("NAME", MOVIE);
 				startActivityForResult(intent, changeImage);
 			}
 		});
 		docsFiles = (Button) findViewById(R.id.btn_docsFiles);
+		docsFiles.setBackgroundResource(R.drawable.icon_folders);
 		docsFiles.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Main.this, Images.class);
 				intent.putExtra("NAME", DOCUMENTS);
 				startActivityForResult(intent, changeImage);
 			}
 		});
 		zipsFiles = (Button) findViewById(R.id.btn_zipsFiles);
+		zipsFiles.setBackgroundResource(R.drawable.icon_folders);
 		zipsFiles.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Main.this, Images.class);
 				intent.putExtra("NAME", ZIPS);
 				startActivityForResult(intent, changeImage);
 			}
 		});
 		apksFiles = (Button) findViewById(R.id.btn_apksFiles);
+		apksFiles.setBackgroundResource(R.drawable.icon_folders);
 		apksFiles.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Main.this, Images.class);
 				intent.putExtra("NAME", APKS);
 				startActivityForResult(intent, changeImage);
 			}
 		});
+
+		// scanned = true;
+		// readFiles();
+		updateLayoutData();
 	}
 
 	// @Override
@@ -189,9 +189,8 @@ public class Main extends Activity {
 							Main.this,
 							"",
 							"Please wait, it might take 1 min if you have too many files.",
-							true, false);
-			dialog = progressDialog;
-			break;
+							true, true);
+			return progressDialog;
 		case dialog_Exit:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Are you sure you want to exit?").setCancelable(
@@ -216,9 +215,12 @@ public class Main extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
 			if (scanned == true) {
+				scanned = false;
+				mThread.interrupt();
 				// mThread.stop();
-				progressDialog.dismiss();
 				updateLayoutData();
+				progressDialog.dismiss();
+
 			} else {
 				showDialog(dialog_Exit);
 			}
@@ -236,7 +238,7 @@ public class Main extends Activity {
 	public void readFiles() {
 		if (!scanned)
 			return;
-
+		// File storage = Environment.getRootDirectory();
 		File storage = Environment.getExternalStorageDirectory();
 		// Log.i(TAG, storage.getAbsolutePath());
 		// Log.i(TAG, Environment.getExternalStorageState());
@@ -254,12 +256,16 @@ public class Main extends Activity {
 	 * Skip the directories starts with dot.
 	 */
 	public void readSingleFile(File file) {
+		if (scanned == false)
+			return;
 		if (file == null)
 			return;
 		File[] files = file.listFiles();
 		if (files == null)
 			return;
 		for (File f : files) {
+			if (!scanned)
+				return;
 			if (f.isFile()) {
 				insertFile(f);
 			} else if (f.isDirectory()) {
