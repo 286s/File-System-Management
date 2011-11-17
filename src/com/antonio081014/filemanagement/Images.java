@@ -6,13 +6,18 @@ package com.antonio081014.filemanagement;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView.ScaleType;
@@ -35,6 +39,7 @@ import android.widget.ImageView.ScaleType;
  * 
  */
 public class Images extends Activity {
+	private static final String TAG = "FMS";
 
 	private MyAdapter myAdapter;
 	private String msg;
@@ -45,7 +50,8 @@ public class Images extends Activity {
 	private String[] show_Path;
 
 	private static final int dialog_delete = 0;
-	// private static final int dialog_share = 1;
+	private static final int dialog_display_picture = 1;
+	// private static final int dialog_share = 2;
 
 	private int current_position = -1;
 
@@ -56,7 +62,9 @@ public class Images extends Activity {
 			// TODO Auto-generated method stub
 			LinearLayout all = new LinearLayout(Images.this);
 			all.setOrientation(LinearLayout.HORIZONTAL);
-
+			// all.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+			// LayoutParams.WRAP_CONTENT));
+			// all.setBackgroundResource(R.drawable.list_row_background);
 			ImageView imgV = new ImageView(Images.this);
 			if (msg.compareTo(Main.IMAGE) == 0) {
 				// Bitmap myBitmap =
@@ -84,36 +92,40 @@ public class Images extends Activity {
 			imgV.setAdjustViewBounds(true);
 			imgV.setMaxHeight(30);
 			imgV.setMaxWidth(23);
-			imgV.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+			imgV.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
 					LayoutParams.WRAP_CONTENT));
 			all.addView(imgV);
 
 			LinearLayout sub = new LinearLayout(Images.this);
 			sub.setOrientation(LinearLayout.VERTICAL);
+			sub.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+					LayoutParams.WRAP_CONTENT));
 
 			TextView tv_name = new TextView(Images.this);
 			tv_name.setText(show_Name[position]);
 			tv_name.setTextSize(18);
 			tv_name.setTextColor(Color.MAGENTA);
-			tv_name.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-					LayoutParams.WRAP_CONTENT));
+			// tv_name.setLayoutParams(new
+			// LayoutParams(LayoutParams.FILL_PARENT,
+			// LayoutParams.WRAP_CONTENT));
 
 			TextView tv_path = new TextView(Images.this);
 			tv_path.setText(show_Path[position]);
 			tv_path.setTextSize(10);
-			tv_path.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-					LayoutParams.WRAP_CONTENT));
+			tv_path.setTextColor(Color.DKGRAY);
+			// tv_path.setLayoutParams(new
+			// LayoutParams(LayoutParams.FILL_PARENT,
+			// LayoutParams.WRAP_CONTENT));
 
 			sub.addView(tv_name);
 			sub.addView(tv_path);
 
-			if (position % 2 == 0)
-				all.setBackgroundColor(Color.BLACK);
-			else
-				all.setBackgroundColor(Color.WHITE);
+			// if (position % 2 == 0)
+			// all.setBackgroundColor(Color.BLACK);
+			// else
+			// all.setBackgroundColor(Color.WHITE);
+			all.setBackgroundColor(Color.TRANSPARENT);
 			all.addView(sub);
-			// all.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-			// LayoutParams.WRAP_CONTENT));
 			return all;
 		}
 
@@ -156,17 +168,9 @@ public class Images extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View view,
 					int position, long id) {
 				current_position = position;
+				preview();
 			}
 		});
-
-		// listview.setOnItemLongClickListener(new OnItemLongClickListener() {
-		// @Override
-		// public boolean onItemLongClick(AdapterView<?> arg0, View view,
-		// int position, long id) {
-		// current_position = position;
-		// return true;
-		// }
-		// });
 	}
 
 	@Override
@@ -183,8 +187,7 @@ public class Images extends Activity {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		current_position = info.position;
-		Toast.makeText(getApplicationContext(), show_Name[current_position],
-				Toast.LENGTH_LONG).show();
+		Log.i(TAG, show_Name[current_position]);
 
 		switch (item.getItemId()) {
 		case R.id.menu_delete:
@@ -195,6 +198,12 @@ public class Images extends Activity {
 			return true;
 		default:
 			return super.onContextItemSelected(item);
+		}
+	}
+
+	protected void preview() {
+		if (msg.compareTo(Main.IMAGE) == 0) {
+			showDialog(dialog_display_picture);
 		}
 	}
 
@@ -237,9 +246,10 @@ public class Images extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		Dialog dialog = null;
+		Context mContext = this; // getApplicationContext();
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		switch (id) {
 		case dialog_delete:
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Are you sure to delete this file?")
 					.setCancelable(false).setPositiveButton("Yes",
 							new DialogInterface.OnClickListener() {
@@ -259,6 +269,44 @@ public class Images extends Activity {
 							});
 			dialog = builder.create();
 			break;
+		case dialog_display_picture:
+			// Inflate the layout view;
+			Log.i(TAG, show_Name[current_position]);
+			// Toast.makeText(mContext, show_Name[current_position],
+			// Toast.LENGTH_LONG).show();
+			LayoutInflater inflater = (LayoutInflater) mContext
+					.getSystemService(LAYOUT_INFLATER_SERVICE);
+			View layout = inflater.inflate(R.layout.dialog_display_image,
+					(ViewGroup) findViewById(R.id.layout_root));
+
+			// Assign the image to the right view;
+			ImageView iv = (ImageView) layout
+					.findViewById(R.id.dialog_display_image);
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			// will results in a much smaller image than the original
+			options.inSampleSize = 8;
+			// Bitmap picture = BitmapFactory.decodeFile(
+			// show_Path[current_position], options);
+			final Bitmap picture = BitmapFactory
+					.decodeFile(show_Path[current_position]);
+			iv.setImageBitmap(picture);
+
+			// Construct the dialog;
+			builder.setTitle(show_Name[current_position]);
+			builder.setView(layout);
+			builder.setPositiveButton("Finish",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							removeDialog(dialog_display_picture);
+						}
+					});
+			dialog = builder.create();
+			break;
+		default:
+			super.onCreateDialog(id);
 		}
 		return dialog;
 	}

@@ -2,17 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
-    <TextView
-        android:id="@+id/rowName"
+    android:orientation="horizontal" >
+    <ImageView
+        android:id="@+id/rowImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/Color_Red"
-        android:textSize="30px" />
-    <TextView
-        android:id="@+id/rowPath"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/Color_Blue"
-        android:textSize="20px" />
+        android:orientation="vertical" >
+        <TextView
+            android:id="@+id/rowName"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/Color_Red"
+            android:textSize="30px" />
+        <TextView
+            android:id="@+id/rowPath"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/Color_Blue"
+            android:textSize="20px" />
+    </LinearLayout>
 </LinearLayout>
