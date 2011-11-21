@@ -13,6 +13,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -51,9 +54,12 @@ public class Images extends Activity {
 
 	private static final int dialog_delete = 0;
 	private static final int dialog_display_picture = 1;
-	// private static final int dialog_share = 2;
+	private static final int dialog_sureToDelete = 2;
+	private static final int dialog_playAudio = 3;
+	private static final int dialog_playMovie = 4;
 
 	private int current_position = -1;
+	private MediaPlayer mPlayer;
 
 	BaseAdapter myBaseAdapter = new BaseAdapter() {
 
@@ -160,6 +166,14 @@ public class Images extends Activity {
 		listview = (ListView) findViewById(R.id.list_display);
 		listview.setAdapter(myBaseAdapter);
 		fillData(msg);
+		mPlayer = new MediaPlayer();
+		mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				mPlayer.reset();
+			}
+		});
 		registerForContextMenu(listview);
 
 		// Preview the file selected;
@@ -191,7 +205,7 @@ public class Images extends Activity {
 
 		switch (item.getItemId()) {
 		case R.id.menu_delete:
-			showDialog(dialog_delete);
+			showDialog(dialog_sureToDelete);
 			return true;
 		case R.id.menu_share:
 			share();
@@ -204,6 +218,15 @@ public class Images extends Activity {
 	protected void preview() {
 		if (msg.compareTo(Main.IMAGE) == 0) {
 			showDialog(dialog_display_picture);
+			return;
+		}
+		if (msg.compareTo(Main.AUDIO) == 0) {
+			showDialog(dialog_playAudio);
+			return;
+		}
+		if (msg.compareTo(Main.MOVIE) == 0) {
+			showDialog(dialog_playMovie);
+			return;
 		}
 	}
 
@@ -294,7 +317,15 @@ public class Images extends Activity {
 			// Construct the dialog;
 			builder.setTitle(show_Name[current_position]);
 			builder.setView(layout);
-			builder.setPositiveButton("Finish",
+			builder.setPositiveButton("Delete",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// TODO Auto-generated method stub
+							showDialog(dialog_sureToDelete);
+						}
+					}).setNegativeButton("Done",
 					new DialogInterface.OnClickListener() {
 
 						@Override
@@ -303,7 +334,97 @@ public class Images extends Activity {
 							removeDialog(dialog_display_picture);
 						}
 					});
+
 			dialog = builder.create();
+			break;
+		case dialog_sureToDelete:
+			builder.setTitle("Delete " + show_Name[current_position]);
+			builder
+					.setMessage("1. System Delete: delete the item from system. Non-revertable.\n"
+							+ "2. View Delete: delete the item from view, it still exists on the system.\n"
+							+ "3. Cancel: delete nothing.");
+			builder.setPositiveButton("System Delete",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							myAdapter.deleteFile(show_ID[current_position],
+									false);
+						}
+					}).setNeutralButton("View Delete",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							myAdapter.deleteFile(show_ID[current_position],
+									true);
+						}
+					}).setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							removeDialog(dialog_sureToDelete);
+						}
+					});
+			dialog = builder.create();
+		case dialog_playAudio:
+			builder.setTitle("Playing " + show_Name[current_position]);
+			builder.setCancelable(false);
+			builder.setPositiveButton("Start",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+						}
+					}).setNegativeButton("Close",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+						}
+					});
+			dialog = builder.create();
+			dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+				@Override
+				public void onShow(DialogInterface dialog) {
+					// TODO Auto-generated method stub
+					Button startPlayer = ((AlertDialog) dialog)
+							.getButton(dialog.BUTTON_POSITIVE);
+					startPlayer.setOnClickListener(new View.OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if (mPlayer.isPlaying() == false) {
+								try {
+									mPlayer
+											.setAudioStreamType(AudioManager.STREAM_MUSIC);
+									mPlayer
+											.setDataSource(show_Path[current_position]);
+									mPlayer.prepare();
+									mPlayer.start();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					});
+
+					Button closeButton = ((AlertDialog) dialog)
+							.getButton(dialog.BUTTON_NEGATIVE);
+					closeButton.setOnClickListener(new View.OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if (mPlayer.isPlaying())
+								mPlayer.stop();
+							mPlayer.reset();
+							removeDialog(dialog_playAudio);
+						}
+					});
+				}
+			});
 			break;
 		default:
 			super.onCreateDialog(id);
@@ -346,12 +467,14 @@ public class Images extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
+		mPlayer.release();
 		myAdapter.close();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mPlayer.release();
 		if (myAdapter != null) {
 			myAdapter.close();
 		}
