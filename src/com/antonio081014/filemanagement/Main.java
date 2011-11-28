@@ -35,6 +35,7 @@ public class Main extends Activity {
     private static final int menu_Refresh = 0;
     private static final int dialog_Progress = 0;
     private static final int dialog_Exit = 1;
+    private static final int dialog_SDCard = 2;
 
     Button imageFiles;
     Button audioFiles;
@@ -126,7 +127,7 @@ public class Main extends Activity {
 	    @Override
 	    public void onClick(View v) {
 		Intent intent = new Intent(Main.this, Images.class);
-		intent.putExtra("NAME", APKS);
+		intent.putExtra("NAME", Main.APKS);
 		startActivityForResult(intent, changeImage);
 	    }
 	});
@@ -183,6 +184,7 @@ public class Main extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
 	Dialog dialog = null;
+	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 	switch (id) {
 	case dialog_Progress:
 	    progressDialog = ProgressDialog
@@ -193,7 +195,6 @@ public class Main extends Activity {
 			    true, true);
 	    return progressDialog;
 	case dialog_Exit:
-	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
 	    builder.setMessage("Are you sure you want to exit?").setCancelable(
 		    false).setPositiveButton("Yes",
 		    new DialogInterface.OnClickListener() {
@@ -203,11 +204,22 @@ public class Main extends Activity {
 		    }).setNegativeButton("No",
 		    new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-			    dialog.cancel();
+			    dialog.dismiss();
 			}
 		    });
 	    dialog = builder.create();
 	    break;
+	case dialog_SDCard:
+	    builder.setMessage(
+		    "Your SD card might not be amounted, please check.")
+		    .setCancelable(false);
+	    builder.setPositiveButton("OK",
+		    new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+			    dialog.dismiss();
+			}
+		    });
 	}
 	return dialog;
     }
@@ -239,22 +251,18 @@ public class Main extends Activity {
     public void readFiles() {
 	if (!scanned)
 	    return;
-	// File storage = Environment.getRootDirectory();
-	File storage = Environment.getExternalStorageDirectory();
-	// Log.i(TAG, Environment.DIRECTORY_DOWNLOADS);
-	// Log.i(TAG,
-	// Environment.getDownloadCacheDirectory().getAbsolutePath());
-	// Log.i(TAG, storage.getAbsolutePath());
-	// Log.i(TAG, Environment.getExternalStorageState());
-	// Log.i(TAG, Environment.getDataDirectory().getAbsolutePath());
-	// Log.i(TAG, Environment.getExternalStoragePublicDirectory(
-	// ACCOUNT_SERVICE).getAbsolutePath());
-
-	/*
-	 * Refresh the database table. Then refill the table again.
-	 */
-	myAdapter.clearTable();
-	readSingleFile(storage);
+	if (Environment.getExternalStorageState().equals(
+		Environment.MEDIA_MOUNTED)) {
+	    // File storage = Environment.getRootDirectory();
+	    File storage = Environment.getExternalStorageDirectory();
+	    /*
+	     * Refresh the database table. Then refill the table again.
+	     */
+	    myAdapter.clearTable();
+	    readSingleFile(storage);
+	} else {
+	    showDialog(dialog_SDCard);
+	}
 	scanned = false;
     }
 
@@ -267,6 +275,8 @@ public class Main extends Activity {
 	if (scanned == false)
 	    return;
 	if (file == null)
+	    return;
+	if (!file.canRead() && !file.canWrite())
 	    return;
 	File[] files = file.listFiles();
 	if (files == null)
@@ -296,7 +306,7 @@ public class Main extends Activity {
 	if (name.endsWith(".jpg") || name.endsWith(".gif")
 		|| name.endsWith(".png") || name.endsWith(".bmp")
 		|| name.endsWith(".webp")) {
-	    myAdapter.insertFile("Image", file.getName(), file
+	    myAdapter.insertFile(Main.IMAGE, file.getName(), file
 		    .getAbsolutePath());
 	} else if (name.endsWith(".wav") || name.endsWith(".m4a")
 		|| name.endsWith(".ogg") || name.endsWith(".aac")
@@ -305,10 +315,21 @@ public class Main extends Activity {
 		|| name.endsWith(".mxmf") || name.endsWith(".rtx")
 		|| name.endsWith(".imy") || name.endsWith(".ota")
 		|| name.endsWith(".rtttl")) {
-	    myAdapter.insertFile("Audio", file.getName(), file
+	    myAdapter.insertFile(Main.AUDIO, file.getName(), file
 		    .getAbsolutePath());
 	} else if (name.endsWith(".3gp") || name.endsWith(".mp4")) {
-	    myAdapter.insertFile("Movie", file.getName(), file
+	    myAdapter.insertFile(Main.MOVIE, file.getName(), file
+		    .getAbsolutePath());
+	} else if (name.endsWith(".txt") || name.endsWith(".doc")
+		|| name.endsWith(".docs") || name.endsWith(".pdf")
+		|| name.endsWith(".rtf")) {
+	    myAdapter.insertFile(Main.DOCUMENTS, file.getName(), file
+		    .getAbsolutePath());
+	} else if (name.endsWith(".zip") || name.endsWith(".rar")) {
+	    myAdapter.insertFile(Main.ZIPS, file.getName(), file
+		    .getAbsolutePath());
+	} else if (name.endsWith(".apk")) {
+	    myAdapter.insertFile(Main.APKS, file.getName(), file
 		    .getAbsolutePath());
 	}
     }
@@ -318,33 +339,30 @@ public class Main extends Activity {
      */
     private void updateLayoutData() {
 	img = (TextView) findViewById(R.id.tv_images);
-	img
-		.setText(getResources().getText(R.string.images)
-			+ " ("
-			+ Integer.toString(myAdapter.fetchFileByType(IMAGE)
-				.getCount()) + ")");
-	aud = (TextView) findViewById(R.id.tv_audios);
-	aud
-		.setText(getResources().getText(R.string.audios)
-			+ " ("
-			+ Integer.toString(myAdapter.fetchFileByType(AUDIO)
-				.getCount()) + ")");
-	mov = (TextView) findViewById(R.id.tv_movies);
-	mov
-		.setText(getResources().getText(R.string.movies)
-			+ " ("
-			+ Integer.toString(myAdapter.fetchFileByType(MOVIE)
-				.getCount()) + ")");
-	doc = (TextView) findViewById(R.id.tv_docs);
-	doc.setText(getResources().getText(R.string.documents) + " ("
-		+ Integer.toString(myAdapter.fetchFileByType(DOCUMENTS).getCount())
+	img.setText(getResources().getText(R.string.images) + " ("
+		+ Integer.toString(myAdapter.fetchFileByType(IMAGE).getCount())
 		+ ")");
+	aud = (TextView) findViewById(R.id.tv_audios);
+	aud.setText(getResources().getText(R.string.audios) + " ("
+		+ Integer.toString(myAdapter.fetchFileByType(AUDIO).getCount())
+		+ ")");
+	mov = (TextView) findViewById(R.id.tv_movies);
+	mov.setText(getResources().getText(R.string.movies) + " ("
+		+ Integer.toString(myAdapter.fetchFileByType(MOVIE).getCount())
+		+ ")");
+	doc = (TextView) findViewById(R.id.tv_docs);
+	doc.setText(getResources().getText(R.string.documents)
+		+ " ("
+		+ Integer.toString(myAdapter.fetchFileByType(DOCUMENTS)
+			.getCount()) + ")");
 	zip = (TextView) findViewById(R.id.tv_zips);
 	zip.setText(getResources().getText(R.string.zipfiles) + " ("
-		+ Integer.toString(myAdapter.fetchFileByType(ZIPS).getCount()) + ")");
+		+ Integer.toString(myAdapter.fetchFileByType(ZIPS).getCount())
+		+ ")");
 	apk = (TextView) findViewById(R.id.tv_apks);
 	apk.setText(getResources().getText(R.string.apkfiles) + " ("
-		+ Integer.toString(myAdapter.fetchFileByType(APKS).getCount()) + ")");
+		+ Integer.toString(myAdapter.fetchFileByType(APKS).getCount())
+		+ ")");
     }
 
     @Override

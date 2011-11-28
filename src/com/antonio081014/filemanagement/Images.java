@@ -54,7 +54,7 @@ public class Images extends Activity {
     private String msg;
     private ListView listview;
 
-    private int[] show_ID;
+    private long[] show_ID;
     private String[] show_Name;
     private String[] show_Path;
 
@@ -69,7 +69,6 @@ public class Images extends Activity {
     private static final int menu_unfilter = 1;
 
     private int current_position = -1;
-    private boolean isByName = false;
     private MediaPlayer mPlayer;
 
     BaseAdapter myBaseAdapter = new BaseAdapter() {
@@ -291,14 +290,9 @@ public class Images extends Activity {
 			    new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,
 					int id) {
-				    myAdapter.open();
-				    myAdapter.deleteFile(
-					    show_ID[current_position], true);
-				    myAdapter.close();
-				    current_position = -1;
-				    fillDatas(msg, false);
+				    showDialog(dialog_sureToDelete);
 				}
-			    }).setNegativeButton("No",
+			    }).setNegativeButton("Cancel",
 			    new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,
 					int id) {
@@ -481,7 +475,6 @@ public class Images extends Activity {
     @Override
     protected void onResume() {
 	myAdapter = new MyAdapter(this);
-	// myAdapter.open();
 	fillDatas(msg, false);
 	myBaseAdapter.notifyDataSetChanged();
 	super.onResume();
@@ -496,7 +489,7 @@ public class Images extends Activity {
     }
 
     private void fillDataByName(String str) {
-	List<Integer> list_ids = new ArrayList<Integer>();
+	List<Long> list_ids = new ArrayList<Long>();
 	List<String> list_names = new ArrayList<String>();
 	List<String> list_paths = new ArrayList<String>();
 	for (int i = 0; i < show_Name.length; i++) {
@@ -511,7 +504,7 @@ public class Images extends Activity {
 		    Toast.LENGTH_LONG).show();
 	    return;
 	}
-	show_ID = new int[list_ids.size()];
+	show_ID = new long[list_ids.size()];
 	show_Name = new String[list_ids.size()];
 	show_Path = new String[list_ids.size()];
 	for (int i = 0; i < list_ids.size(); i++) {
@@ -528,7 +521,7 @@ public class Images extends Activity {
 	int idIndex = mCursor.getColumnIndex(DatabaseHelper.KEY_ROWID);
 	int nameIndex = mCursor.getColumnIndex(DatabaseHelper.KEY_NAME);
 	int pathIndex = mCursor.getColumnIndex(DatabaseHelper.KEY_PATH);
-	show_ID = new int[mCursor.getCount()];
+	show_ID = new long[mCursor.getCount()];
 	show_Name = new String[mCursor.getCount()];
 	show_Path = new String[mCursor.getCount()];
 

@@ -90,27 +90,28 @@ public class MyAdapter {
      * @return if delete operation succeeded.
      */
     public boolean deleteFile(long rowId, boolean fromDatabaseOnly) {
-	Cursor mCursor = mDb.query(DatabaseHelper.DATABASE_TABLE, new String[] {
-		DatabaseHelper.KEY_ROWID, DatabaseHelper.KEY_PROP,
-		DatabaseHelper.KEY_NAME, DatabaseHelper.KEY_PATH },
-		DatabaseHelper.KEY_ROWID + "=" + Long.toString(rowId), null,
-		null, null, null);
+	Cursor mCursor = mDb.query(true, DatabaseHelper.DATABASE_TABLE,
+		new String[] { DatabaseHelper.KEY_ROWID,
+			DatabaseHelper.KEY_PROP, DatabaseHelper.KEY_NAME,
+			DatabaseHelper.KEY_PATH }, DatabaseHelper.KEY_ROWID
+			+ "=" + rowId + "", null, null, null, null, null);
 	if (mCursor != null) {
 	    mCursor.moveToFirst();
 	    Log.i("FMS", Integer.toString(mCursor.getColumnCount()));
-	    boolean successful = mDb.delete(DatabaseHelper.DATABASE_TABLE,
-		    DatabaseHelper.KEY_ROWID + "=" + rowId, null) > 0;
+	    boolean successful = true;
 	    if (!fromDatabaseOnly) {
 		String path = new String(mCursor.getBlob(mCursor
-			.getColumnIndex(DatabaseHelper.KEY_PATH)));
+			.getColumnIndex(DatabaseHelper.KEY_PATH))).trim();
+		Log.i("FMS", path);
 		File file = new File(path);
-		successful &= file.delete();
+		successful = successful && file.delete();
 	    }
-	    successful &= mDb.delete(DatabaseHelper.DATABASE_TABLE,
-		    DatabaseHelper.KEY_ROWID + "=" + rowId, null) > 0;
+	    successful = successful
+		    && (mDb.delete(DatabaseHelper.DATABASE_TABLE,
+			    DatabaseHelper.KEY_ROWID + "=" + rowId, null) > 0);
 	    mCursor.close();
 	    return successful;
 	}
-	return false;
+	return true;
     }
 }
