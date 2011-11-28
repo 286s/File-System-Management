@@ -291,8 +291,10 @@ public class Images extends Activity {
 			    new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog,
 					int id) {
+				    myAdapter.open();
 				    myAdapter.deleteFile(
 					    show_ID[current_position], true);
+				    myAdapter.close();
 				    current_position = -1;
 				    fillDatas(msg, false);
 				}
@@ -355,23 +357,28 @@ public class Images extends Activity {
 			    + "3. Cancel: delete nothing.");
 	    builder.setPositiveButton("System Delete",
 		    new DialogInterface.OnClickListener() {
-
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+			    myAdapter.open();
 			    myAdapter.deleteFile(show_ID[current_position],
 				    false);
+			    myAdapter.close();
+			    fillDatas(msg, false);
+			    myBaseAdapter.notifyDataSetChanged();
 			}
 		    }).setNeutralButton("View Delete",
 		    new DialogInterface.OnClickListener() {
-
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+			    myAdapter.open();
 			    myAdapter.deleteFile(show_ID[current_position],
 				    true);
+			    myAdapter.close();
+			    fillDatas(msg, false);
+			    myBaseAdapter.notifyDataSetChanged();
 			}
 		    }).setNegativeButton("Cancel",
 		    new DialogInterface.OnClickListener() {
-
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 			    removeDialog(dialog_sureToDelete);
@@ -384,7 +391,6 @@ public class Images extends Activity {
 	    builder.setCancelable(false);
 	    builder.setPositiveButton("Start",
 		    new DialogInterface.OnClickListener() {
-
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 			}
