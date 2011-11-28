@@ -10,5 +10,7 @@
     <string name="menu_refresh">Rescan</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_share">Share</string>
+    <string name="menu_unfilter">Unfilter</string>
+    <string name="menu_search">Filter By Name</string>
     <string name="contextMenu">Share or Delete</string>
 </resources>
