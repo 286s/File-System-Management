@@ -13,4 +13,6 @@
     <string name="menu_unfilter">Unfilter</string>
     <string name="menu_search">Filter By Name</string>
     <string name="contextMenu">Share or Delete</string>
+    <string name="Start">Start</string>
+    <string name="Close">Close</string>
 </resources>
